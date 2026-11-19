@@ -1,0 +1,21 @@
+# Configurações locais de ferramentas
+.claude/
+.vscode/
+.idea/
+
+# Atalhos do Windows (têm caminho absoluto da máquina — gere com criar-atalho.ps1)
+*.lnk
+
+# Arquivos do sistema
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Backups exportados da ficha (dados pessoais)
+*.json
+!manifest.webmanifest
+
+# Dependências e temporários, caso surjam no futuro
+node_modules/
+*.log
+*.tmp

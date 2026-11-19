@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#121318" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f4f1ea" media="(prefers-color-scheme: light)">
+  <title>Ficha de RPG</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Ficha">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-tab="sheet">
+  <header class="topbar">
+    <div class="brand">
+      Ficha de RPG
+      <span class="save-error" id="save-error" role="alert" hidden>Não foi possível salvar — exporte um backup</span>
+    </div>
+    <button class="btn" id="layout-toggle" type="button" aria-pressed="false">Editar layout</button>
+    <details class="menu" id="menu">
+      <summary class="btn icon-only" aria-label="Mais opções" title="Mais opções">⋯</summary>
+      <div class="menu-list">
+        <button class="btn" type="button" id="export-btn">Exportar ficha (.json)</button>
+        <button class="btn" type="button" id="import-btn">Importar ficha</button>
+        <button class="btn danger-text" type="button" id="reset-btn">Restaurar ficha padrão</button>
+      </div>
+    </details>
+    <input type="file" id="import-file" accept="application/json,.json" hidden>
+  </header>
+
+  <main class="app">
+    <div class="panel" id="sheet-panel">
+      <div id="sheet" class="sheet"></div>
+    </div>
+
+    <aside class="panel" id="dice-panel" aria-label="Dados">
+      <section class="card result" id="result-card" aria-live="polite">
+        <p class="empty">Escolha um dado e role.</p>
+      </section>
+
+      <section class="card" aria-labelledby="roller-title">
+        <h2 id="roller-title">Rolar dados</h2>
+        <div class="dice-picker" id="dice-picker" role="group" aria-label="Tipo de dado"></div>
+
+        <div class="roller-grid">
+          <div class="mini">
+            <span id="r-count-label">Quantidade</span>
+            <div class="stepper">
+              <button class="step" type="button" data-step="count:-1" aria-label="Menos dados">−</button>
+              <input class="input" id="r-count" type="number" min="1" max="100" aria-labelledby="r-count-label">
+              <button class="step" type="button" data-step="count:1" aria-label="Mais dados">+</button>
+            </div>
+          </div>
+          <div class="mini">
+            <span id="r-bonus-label">Bônus</span>
+            <div class="stepper">
+              <button class="step" type="button" data-step="bonus:-1" aria-label="Diminuir bônus">−</button>
+              <input class="input" id="r-bonus" type="number" step="1" aria-labelledby="r-bonus-label">
+              <button class="step" type="button" data-step="bonus:1" aria-label="Aumentar bônus">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="segmented" id="r-mode" role="radiogroup" aria-label="Modo de rolagem">
+          <button type="button" role="radio" data-mode="sum">Somar tudo</button>
+          <button type="button" role="radio" data-mode="max">Maior resultado</button>
+        </div>
+
+        <button class="btn primary roll-btn" id="r-roll" type="button">Rolar <span id="r-expr"></span></button>
+      </section>
+
+      <section class="card" aria-labelledby="macros-title">
+        <div class="section-head">
+          <h2 id="macros-title">Macros</h2>
+          <button class="btn small" id="new-macro" type="button">+ Nova macro</button>
+        </div>
+        <div class="list" id="macro-list"></div>
+      </section>
+
+      <section class="card" aria-labelledby="hist-title">
+        <div class="section-head">
+          <h2 id="hist-title">Histórico</h2>
+          <button class="btn small ghost" id="clear-history" type="button">Limpar</button>
+        </div>
+        <div id="history"></div>
+      </section>
+    </aside>
+  </main>
+
+  <nav class="tabs" role="tablist" aria-label="Navegação">
+    <button class="tab" type="button" role="tab" data-tab="sheet" aria-selected="true">
+      <span class="tab-icon" aria-hidden="true">📜</span>Ficha
+    </button>
+    <button class="tab" type="button" role="tab" data-tab="dice" aria-selected="false">
+      <span class="tab-icon" aria-hidden="true">🎲</span>Dados
+    </button>
+  </nav>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+
+  <dialog id="macro-dialog">
+    <form method="dialog" id="macro-form">
+      <div class="dialog-body">
+        <h2 id="macro-title">Nova macro</h2>
+
+        <label class="form-row">Nome
+          <input class="input" id="m-name" type="text" placeholder="Ex.: Ataque com espada" autocomplete="off">
+        </label>
+
+        <fieldset class="form-row">
+          <legend>Quantidade de dados</legend>
+          <div class="row-2">
+            <select class="input" id="m-count-field" aria-label="Origem da quantidade"></select>
+            <input class="input" id="m-count" type="number" min="1" max="100" aria-label="Quantidade fixa">
+          </div>
+          <small class="hint">Use um número fixo ou o valor de um campo da ficha (ex.: um atributo).</small>
+        </fieldset>
+
+        <fieldset class="form-row">
+          <legend>Dado</legend>
+          <div class="row-2">
+            <select class="input" id="m-sides-preset" aria-label="Tipo de dado"></select>
+            <input class="input" id="m-sides" type="number" min="2" max="1000" aria-label="Lados do dado personalizado" placeholder="Lados">
+          </div>
+        </fieldset>
+
+        <fieldset class="form-row">
+          <legend>Bônus</legend>
+          <div class="row-2">
+            <input class="input" id="m-bonus" type="number" step="1" aria-label="Bônus fixo">
+            <select class="input" id="m-bonus-field" aria-label="Somar valor de um campo"></select>
+          </div>
+          <small class="hint">Bônus fixo + (opcional) o valor de um campo, como uma perícia.</small>
+        </fieldset>
+
+        <fieldset class="form-row">
+          <legend>Dados de bônus</legend>
+          <div class="extra-list" id="m-extra"></div>
+          <button class="btn small ghost add-extra" id="m-add-extra" type="button">+ Dado de bônus</button>
+          <small class="hint">Sempre somados ao resultado (ex.: + 1d6 de dano extra), mesmo no modo “Maior resultado”.</small>
+        </fieldset>
+
+        <fieldset class="form-row">
+          <legend>Resultado</legend>
+          <div class="segmented">
+            <label class="seg-radio"><input type="radio" name="m-mode" value="sum"> Somar tudo</label>
+            <label class="seg-radio"><input type="radio" name="m-mode" value="max"> Maior resultado</label>
+          </div>
+        </fieldset>
+
+        <p class="preview" id="macro-preview"></p>
+      </div>
+      <div class="dialog-actions">
+        <button class="btn ghost" type="submit" value="cancel" formnovalidate>Cancelar</button>
+        <button class="btn primary" type="submit" value="save">Salvar macro</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Ordem importa: domínio → infraestrutura → aplicação → interface → entrada -->
+  <script src="js/core.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/ui/dom.js"></script>
+  <script src="js/ui/sheet-view.js"></script>
+  <script src="js/ui/dice-view.js"></script>
+  <script src="js/ui/macro-dialog.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

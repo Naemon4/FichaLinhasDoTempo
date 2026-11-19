@@ -1,0 +1,43 @@
+Nome:
+Raça:
+Classe:
+
+Força - 
+Agilidade - 
+Vigor - 
+Intelecto - 
+Sabedoria - 
+Carisma - 
+
+ATLETISMO: 
+PRESTIGITAÇÃO:
+FURTIVIDADE: 
+ACROBACIA: 
+INTIMIDAÇÃO:
+PERSUASÃO:
+FORTITUDE: 
+ENGANAÇÃO:
+ATUAÇÃO:
+ADESTRAR:
+MEDICINA:
+SOBREVIVÊNCIA:
+PERCEPÇAO: 
+REFLEXO:
+INTUIÇÃO:
+ARCANISMO: 
+HISTÓRIA:
+RELIGIÃO:
+NATUREZA:
+INVESTIGAÇÃO:
+PONTARIA:
+LUTA: 
+VONTADE:
+
+Status:
+Vida - 
+Energia - 
+Sanidade - 
+
+Liberação de Energia - 
+
+Habs:
