@@ -15,9 +15,9 @@
 
   const ATTRIBUTES = ['Força', 'Agilidade', 'Vigor', 'Intelecto', 'Sabedoria', 'Carisma'];
   const SKILLS = [
-    'Acrobacia', 'Adestrar', 'Arcanismo', 'Atletismo', 'Atuação', 'Enganação', 'Fortitude',
+    'Acrobacia', 'Adestrar', 'Arcanismo', 'Atletismo', 'Diplomacia', 'Enganação', 'Fortitude',
     'Furtividade', 'História', 'Intimidação', 'Intuição', 'Investigação', 'Luta', 'Medicina',
-    'Natureza', 'Percepção', 'Persuasão', 'Pontaria', 'Prestidigitação', 'Reflexo', 'Religião',
+    'Natureza', 'Percepção', 'Pontaria', 'Prestidigitação', 'Reflexo', 'Religião',
     'Sobrevivência', 'Vontade',
   ];
 
